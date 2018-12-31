@@ -18,44 +18,26 @@ _run:
       docker run --name ok -d -p 8888:8888 output;sleep 10;
       docker exec ok curl --retry 10 --retry-delay 5 -v http://localhost:8888/
 jobs:
-  build:
-    <<: *defaults
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: *buildDocker
-      - run: *testImage
-
   build-deploy-branches:
     <<: *defaults
     steps:
       - checkout
       - setup_remote_docker
       - run: *buildDocker
+      - run: *testImage
       - deploy:
           name: Deploy build to docker hub
           command:  |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker tag output randyhoulahan/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BRANCH
             docker push randyhoulahan/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BRANCH
-  build_and_deploy_releases:
-    <<: *defaults
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: *buildDocker
-      - deploy:
-          name: Deploy release build to docker hub
-          command:  |
-            docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-            docker tag output randyhoulahan/$CIRCLE_PROJECT_REPONAME:release-${CIRCLE_BRANCH//release\//}
-            docker push randyhoulahan/$CIRCLE_PROJECT_REPONAME:release-${CIRCLE_BRANCH//release\//}
   build_and_deploy_tags:
     <<: *defaults
     steps:
       - checkout
       - setup_remote_docker
       - run: *buildDocker
+      - run: *testImage
       - deploy:
           name: Deploy tag build to docker hub
           command:  |
@@ -73,7 +55,6 @@ workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - build:
       - build-deploy-branches:
           filters:
             branches:
