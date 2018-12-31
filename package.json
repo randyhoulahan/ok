@@ -1,0 +1,10 @@
+{
+  "name": "ok",
+  "private": true,
+  "dependencies": {
+    "fastify": "^1.13.3"
+  },
+  "engines": {
+    "node": ">=10.0"
+  }
+}

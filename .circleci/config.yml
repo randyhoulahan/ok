@@ -1,0 +1,57 @@
+version: 2
+
+_defaults: &defaults
+  docker:
+    - image: docker:17.05.0-ce
+  working_directory: ~/ok
+  parallelism: 1
+
+_run:
+  buildDocker: &buildDocker
+    name: Build docker image
+    command: |
+      docker info
+      docker build -t output .
+  testImage: &testImage
+    name: Test docker image
+    command:  |
+      docker run --name ok -d -p 8888:8888 output;sleep 10;
+      docker exec ok curl --retry 10 --retry-delay 5 -v http://localhost:8888/
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: *buildDocker
+      - run: *testImage
+
+  build-deploy-branches:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: *buildDocker
+      - deploy:
+          name: Deploy build to docker hub
+          command:  |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker tag output houlagins/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BRANCH
+            docker push houlagins/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BRANCH
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore:
+                - /^(master|dev|stg)$/
+            tags:
+              ignore:
+                - /^v?[0-9]+(\.[0-9]+)*$/
+
+      - build-deploy-branches:
+          filters:
+            branches:
+              only: /^(master|dev|stg)$/
