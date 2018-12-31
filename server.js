@@ -5,7 +5,7 @@ fastify.get('/ok', async (request, reply) => {
   return 'ok'
 })
 
-fastify.listen(8888, (err, address) => {
+fastify.listen(8888,'0.0.0.0', (err, address) => {
   if (err) throw err
   console.info(`server listening on ${address}`)
 })
