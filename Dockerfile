@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 
 COPY . ./
 
-RUN yarn install --flat --production=true
+RUN yarn 
 
 EXPOSE 8888
 
