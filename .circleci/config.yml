@@ -36,8 +36,8 @@ jobs:
           name: Deploy build to docker hub
           command:  |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker tag output houlagins/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BRANCH
-            docker push houlagins/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BRANCH
+            docker tag output randyhoulahan/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BRANCH
+            docker push randyhoulahan/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BRANCH
 workflows:
   version: 2
   build_and_deploy:
