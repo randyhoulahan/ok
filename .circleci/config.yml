@@ -50,21 +50,36 @@ jobs:
             docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
             docker tag output randyhoulahan/$CIRCLE_PROJECT_REPONAME:release-${CIRCLE_BRANCH//release\//}
             docker push randyhoulahan/$CIRCLE_PROJECT_REPONAME:release-${CIRCLE_BRANCH//release\//}
+  build_and_deploy_tags:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: *buildDocker
+      - deploy:
+          name: Deploy tag build to docker hub
+          command:  |
+            if [ "${CIRCLE_PROJECT_USERNAME}" == 'randyhoulahan' ]; then
+              docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+              docker tag output randyhoulahan/$CIRCLE_PROJECT_REPONAME:${CIRCLE_TAG//v/}
+              docker tag output randyhoulahan/$CIRCLE_PROJECT_REPONAME:latest
+              docker push randyhoulahan/$CIRCLE_PROJECT_REPONAME:${CIRCLE_TAG//v/}
+              docker push randyhoulahan/$CIRCLE_PROJECT_REPONAME:latest
+            else
+              eval "echo Branch:"{$CIRCLE_BRANCH}" User:"{$CIRCLE_PROJECT_USERNAME}
+              echo "Invalid tag, only scbd tags allowed"
+            fi
 workflows:
   version: 2
   build_and_deploy:
     jobs:
       - build:
-          filters:
-            branches:
-              ignore:
-                - /^(master|dev|stg)$/
       - build-deploy-branches:
           filters:
             branches:
-              only: /^(master|dev|stg)$/
-      - build_and_deploy_releases:
+              only: /^(dev|stg)$/
+      - build_and_deploy_tags:
           filters:
             branches:
                 only:
-                  - /^release\/.*/
+                  - /^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
