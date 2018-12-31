@@ -1,7 +1,7 @@
 FROM node:10-alpine
 
 RUN apk update && apk upgrade && \
-    apk add --no-cache bash git curl
+    apk add --no-cache yarn
 
 WORKDIR /usr/src/app
 
