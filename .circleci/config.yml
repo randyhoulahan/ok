@@ -49,7 +49,6 @@ jobs:
               docker push randyhoulahan/$CIRCLE_PROJECT_REPONAME:latest
             else
               eval "echo Branch:"{$CIRCLE_BRANCH}" User:"{$CIRCLE_PROJECT_USERNAME}
-              echo "Invalid tag, only scbd tags allowed"
             fi
 workflows:
   version: 2
