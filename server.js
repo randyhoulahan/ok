@@ -1,5 +1,5 @@
-const fastify = require('fastify')({})
-const df = require('@sindresorhus/df');
+const fastify = require('fastify'         )({})
+const df      = require('@sindresorhus/df')
 
 const PATH = process.env.DISK_SPACE_PATH
 
